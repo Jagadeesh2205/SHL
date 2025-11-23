@@ -7,9 +7,9 @@ python-dotenv==1.0.0
 openpyxl==3.1.2
 
 # Embeddings + model
-# Pin to stable, CPU-friendly versions with available wheels on Python 3.11
-sentence-transformers==2.2.2
-torch==2.2.2
+# Use flexible versions to ensure Streamlit Cloud can find compatible wheels
+sentence-transformers>=2.2.0,<3.0.0
+torch>=2.0.0,<2.5.0
 
 # Vector index (optional) — comment out if wheels unavailable in your environment
 # faiss-cpu==1.7.4
