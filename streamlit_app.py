@@ -6,9 +6,16 @@ A simpler deployment-ready version
 import streamlit as st
 import json
 import numpy as np
-import faiss
-from sentence_transformers import SentenceTransformer
 import os
+
+# Try importing faiss; provide graceful fallback if unavailable (e.g. Python 3.13 wheels missing)
+try:
+    import faiss  # type: ignore
+    FAISS_AVAILABLE = True
+except ModuleNotFoundError:
+    FAISS_AVAILABLE = False
+
+from sentence_transformers import SentenceTransformer
 
 # Page config
 st.set_page_config(
@@ -34,16 +41,25 @@ def load_assessments():
 
 @st.cache_resource
 def load_embeddings():
-    """Load embeddings and FAISS index"""
+    """Load embeddings and (optionally) FAISS index"""
     embeddings = np.load('data/embeddings/embeddings.npy')
-    index = faiss.read_index('data/embeddings/faiss.index')
-    return embeddings, index
+    if FAISS_AVAILABLE:
+        index = faiss.read_index('data/embeddings/faiss.index')
+        return embeddings, index
+    # Normalize embeddings for cosine similarity fallback
+    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+    safe_norms = np.where(norms == 0, 1e-9, norms)
+    embeddings_normed = embeddings / safe_norms
+    return embeddings_normed, None
 
 # Load resources
 with st.spinner("Loading models and data..."):
     model = load_model()
     assessments = load_assessments()
     embeddings, index = load_embeddings()
+
+if not FAISS_AVAILABLE:
+    st.warning("FAISS not available. Using NumPy cosine similarity fallback. (Install faiss-cpu on Python 3.11 for vector index speed.)")
 
 st.success(f"✅ Loaded {len(assessments)} assessments")
 
@@ -64,17 +80,27 @@ if st.button("Get Recommendations", type="primary"):
     else:
         with st.spinner("Generating recommendations..."):
             # Generate query embedding
-            query_embedding = model.encode([query], normalize_embeddings=True)
-            
-            # Search FAISS
-            scores, indices = index.search(query_embedding.astype('float32'), k)
-            
-            # Get recommendations
-            recommendations = []
-            for idx, score in zip(indices[0], scores[0]):
-                assessment = assessments[idx].copy()
-                assessment['relevance_score'] = float(score)
-                recommendations.append(assessment)
+            query_embedding = model.encode([query], normalize_embeddings=True).astype('float32')
+
+            if FAISS_AVAILABLE and index is not None:
+                # FAISS search
+                scores, indices = index.search(query_embedding, k)
+                # Collect recommendations
+                recommendations = []
+                for idx, score in zip(indices[0], scores[0]):
+                    assessment = assessments[idx].copy()
+                    assessment['relevance_score'] = float(score)
+                    recommendations.append(assessment)
+            else:
+                # NumPy cosine similarity fallback
+                # embeddings already normalized; query embedding normalized via model.encode(normalize_embeddings=True)
+                sims = embeddings @ query_embedding[0]
+                top_idx = np.argsort(-sims)[:k]
+                recommendations = []
+                for idx in top_idx:
+                    assessment = assessments[idx].copy()
+                    assessment['relevance_score'] = float(sims[idx])
+                    recommendations.append(assessment)
             
             # Display results
             st.subheader(f"Top {k} Recommended Assessments")
@@ -111,9 +137,8 @@ with st.sidebar:
     st.header("About")
     st.markdown("""
     This system uses:
-    - **RAG (Retrieval-Augmented Generation)** approach
     - **Sentence Transformers** for embeddings
-    - **FAISS** for vector search
+    - **Vector Search** via FAISS (if available) or NumPy fallback
     - **SHL Product Catalog** (scraped data)
     
     ### How it works:
@@ -126,6 +151,7 @@ with st.sidebar:
     st.header("Statistics")
     st.metric("Total Assessments", len(assessments))
     st.metric("Embedding Dimension", embeddings.shape[1])
+    st.metric("Vector Backend", "FAISS" if FAISS_AVAILABLE else "NumPy Fallback")
     
     st.header("API Endpoint")
     st.code("POST /recommend", language="http")
