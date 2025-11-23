@@ -1,21 +1,20 @@
-# Requirements for Streamlit Cloud deployment (Python 3.11 recommended)
-# Core dependencies
-streamlit>=1.31.0
-numpy>=1.24.0
-pandas>=2.0.0
-python-dotenv==1.0.0
-openpyxl==3.1.2
+# Requirements for Streamlit Cloud deployment (Python 3.11)
+# Minimal stable configuration
+streamlit
+numpy
+pandas
+python-dotenv
+openpyxl
 
-# Embeddings + model
-# Use flexible versions to ensure Streamlit Cloud can find compatible wheels
-sentence-transformers>=2.2.0,<3.0.0
-torch>=2.0.0,<2.5.0
+# ML dependencies - compatible with both Python 3.11 and 3.13
+sentence-transformers
+transformers
+torch>=2.0.0
+tokenizers
+scikit-learn
 
-# Vector index (optional) — comment out if wheels unavailable in your environment
-# faiss-cpu==1.7.4
-
-# Optional: For Flask API
-flask==3.0.0
-flask-cors==4.0.0
-gunicorn==21.2.0
+# Optional: Flask API (not needed for Streamlit-only deployment)
+# flask
+# flask-cors
+# gunicorn
 
