@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHL Assessment Recommendation System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 SHL Assessment Recommender</h1>
+            <p class="subtitle">Find the perfect assessments for your hiring needs</p>
+        </header>
+
+        <main>
+            <section class="search-section">
+                <div class="input-group">
+                    <label for="queryInput">Enter your requirements</label>
+                    <textarea 
+                        id="queryInput" 
+                        placeholder="E.g., I need a Java developer with good communication skills&#10;Or paste a job description&#10;Or enter a URL to a job posting"
+                        rows="4"
+                    ></textarea>
+                </div>
+
+                <button id="searchBtn" class="btn-primary">
+                    <span class="btn-text">Get Recommendations</span>
+                    <span class="loading-spinner" style="display: none;">⏳</span>
+                </button>
+
+                <div class="examples">
+                    <p><strong>Try these examples:</strong></p>
+                    <div class="example-chips">
+                        <button class="example-chip">Java developer with collaboration skills</button>
+                        <button class="example-chip">Python, SQL, and JavaScript proficiency</button>
+                        <button class="example-chip">Leadership and management assessment</button>
+                        <button class="example-chip">Cognitive and personality tests for analyst</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <div class="results-header">
+                    <h2>📊 Recommendations</h2>
+                    <p id="resultsCount"></p>
+                </div>
+
+                <div id="resultsContainer" class="results-container">
+                    <!-- Results will be inserted here -->
+                </div>
+            </section>
+
+            <section id="errorSection" class="error-section" style="display: none;">
+                <div class="error-message">
+                    <span class="error-icon">⚠️</span>
+                    <p id="errorText"></p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built by Jagadeesh</p>
+            <p class="api-info">
+                <a href="/health" target="_blank">API Health</a> | 
+                <a href="/api/info" target="_blank">API Info</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
