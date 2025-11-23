@@ -15,7 +15,6 @@ try:
 except ModuleNotFoundError:
     FAISS_AVAILABLE = False
 
-from sentence_transformers import SentenceTransformer
 
 # Page config
 st.set_page_config(
@@ -31,6 +30,14 @@ st.markdown("**RAG-based Assessment Recommender** - Enter a job description or r
 @st.cache_resource
 def load_model():
     """Load sentence transformer model"""
+    try:
+        from sentence_transformers import SentenceTransformer
+    except ModuleNotFoundError:
+        st.error(
+            "Missing dependency: sentence-transformers. Add it to requirements.txt and redeploy. "
+            "Recommended pins: sentence-transformers==2.2.2, torch==2.2.2 (Python 3.11)."
+        )
+        return None
     return SentenceTransformer('all-MiniLM-L6-v2')
 
 @st.cache_data
@@ -57,6 +64,9 @@ with st.spinner("Loading models and data..."):
     model = load_model()
     assessments = load_assessments()
     embeddings, index = load_embeddings()
+
+if model is None:
+    st.stop()
 
 if not FAISS_AVAILABLE:
     st.warning("FAISS not available. Using NumPy cosine similarity fallback. (Install faiss-cpu on Python 3.11 for vector index speed.)")
