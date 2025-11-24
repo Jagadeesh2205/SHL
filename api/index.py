@@ -81,6 +81,33 @@ def simple_recommend(query, k=10):
     return [item[0] for item in scored[:k]]
 
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint with API information"""
+    return jsonify({
+        'name': 'SHL Assessment Recommendation API',
+        'version': '1.0.0',
+        'status': 'operational',
+        'endpoints': {
+            'health': {
+                'path': '/v1/shl-assess/health',
+                'method': 'GET',
+                'description': 'Health check endpoint'
+            },
+            'recommend': {
+                'path': '/v1/shl-assess/recommend',
+                'method': 'POST',
+                'description': 'Get assessment recommendations',
+                'example_body': {
+                    'query': 'Looking to hire Java developers with communication skills',
+                    'k': 10
+                }
+            }
+        },
+        'documentation': 'See GitHub repository for full documentation'
+    }), 200
+
+
 @app.route('/health', methods=['GET'])
 def health():
     """Health check"""
@@ -149,13 +176,6 @@ def info():
 
 # Vercel handler
 app_handler = app
-
-
-if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
-    print(f"Starting minimal Flask API on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=True)
-
 
 
 if __name__ == '__main__':
