@@ -68,9 +68,6 @@ with st.spinner("Loading models and data..."):
 if model is None:
     st.stop()
 
-if not FAISS_AVAILABLE:
-    st.warning("FAISS not available. Using NumPy cosine similarity fallback. (Install faiss-cpu on Python 3.11 for vector index speed.)")
-
 st.success(f"✅ Loaded {len(assessments)} assessments")
 
 # Input
@@ -169,4 +166,4 @@ with st.sidebar:
 
 # Footer
 st.markdown("---")
-st.markdown("Built with ❤️ using Streamlit | SHL Assessment Recommendation System")
+st.markdown("SHL Assessment Recommendation System")
