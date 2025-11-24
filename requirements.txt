@@ -14,8 +14,8 @@ tokenizers
 scikit-learn
 faiss-cpu
 
-# Optional: Flask API (not needed for Streamlit-only deployment)
-# flask
-# flask-cors
-# gunicorn
+# Flask API dependencies (required for Render/API deployment)
+flask
+flask-cors
+gunicorn
 
