@@ -12,6 +12,7 @@ transformers
 torch>=2.0.0
 tokenizers
 scikit-learn
+faiss-cpu
 
 # Optional: Flask API (not needed for Streamlit-only deployment)
 # flask
